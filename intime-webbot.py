@@ -52,6 +52,7 @@ def steal_focus():
 parser = argparse.ArgumentParser(description='Import timesheet to InTime')
 parser.add_argument('filename', help='Filename of timesheet')
 parser.add_argument('--url',               default=os.environ.get('INTIME_URL'))
+parser.add_argument('--timesheet-ref',     default=os.environ.get('INTIME_TIMESHEET_REF'))
 parser.add_argument('--column-name-date',  default=os.environ.get('INTIME_COLUMN_NAME_DATE'))
 parser.add_argument('--column-name-total', default=os.environ.get('INTIME_COLUMN_NAME_TOTAL'))
 parser.add_argument('--csv-delimiter',     default=os.environ.get('INTIME_CSV_DELIMITER', ';'))
@@ -70,7 +71,11 @@ profile = webdriver.FirefoxProfile()
 
 driver = webdriver.Firefox(profile)
 wait = WebDriverWait(driver, 10)
-driver.get(args.url + 'timesheetEntry/webEntry')
+
+if args.timesheet_ref:
+    driver.get(args.url + f'timesheetEntry/webEntry?timesheetRef={args.timesheet_ref}')
+else:
+    driver.get(args.url + 'timesheetEntry/webEntry')
 
 wait.until(EC.title_is('Intime'))
 
@@ -82,15 +87,16 @@ except TimeoutException:
     driver.close()
     exit("Login failed.")
 
-select = Select(driver.find_element_by_name('selectedPlacement'))
-select.select_by_index(1)
+if not args.timesheet_ref:
+    select = Select(driver.find_element_by_name('selectedPlacement'))
+    select.select_by_index(1)
 
-elem = wait.until(EC.presence_of_element_located((By.ID, 'timesheetDate')))
-elem.click()
-elem.clear()
-elem.send_keys(now.strftime('%d/%m/%Y'))
+    elem = wait.until(EC.presence_of_element_located((By.ID, 'timesheetDate')))
+    elem.click()
+    elem.clear()
+    elem.send_keys(now.strftime('%d/%m/%Y'))
 
-steal_focus()
+    steal_focus()
 
 with open(args.filename, newline='') as csvfile:
     csvreader = csv.DictReader(csvfile, delimiter=args.csv_delimiter, quotechar=args.csv_quote_char)
