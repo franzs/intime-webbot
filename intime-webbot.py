@@ -107,4 +107,8 @@ with open(args.filename, newline='') as csvfile:
 
         enter_day(date.strftime('%d/%m/%Y'), procon_round(row[args.column_name_total]))
 
+xpath = f"//input[@value='Save As Draft']"
+elem = driver.find_element_by_xpath(xpath)
+elem.click()
+
 driver.close()
