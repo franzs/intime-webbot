@@ -49,14 +49,22 @@ def steal_focus():
     driver.find_element_by_xpath("//body").click()
 
 
+def argument_options(key, default=None):
+    default_value = os.environ.get(key, default)
+
+    map = {'default': default_value} if default_value else {'required': True}
+
+    return map
+
+
 parser = argparse.ArgumentParser(description='Import timesheet to InTime')
 parser.add_argument('filename', help='Filename of timesheet')
-parser.add_argument('--url',               default=os.environ.get('INTIME_URL'))
+parser.add_argument('--url',               **argument_options('INTIME_URL'))
 parser.add_argument('--timesheet-ref',     default=os.environ.get('INTIME_TIMESHEET_REF'))
-parser.add_argument('--column-name-date',  default=os.environ.get('INTIME_COLUMN_NAME_DATE'))
-parser.add_argument('--column-name-total', default=os.environ.get('INTIME_COLUMN_NAME_TOTAL'))
-parser.add_argument('--csv-delimiter',     default=os.environ.get('INTIME_CSV_DELIMITER', ';'))
-parser.add_argument('--csv-quote-char',    default=os.environ.get('INTIME_CSV_QUOTE_CHAR', '"'))
+parser.add_argument('--column-name-date',  **argument_options('INTIME_COLUMN_NAME_DATE'))
+parser.add_argument('--column-name-total', **argument_options('INTIME_COLUMN_NAME_TOTAL'))
+parser.add_argument('--csv-delimiter',     **argument_options('INTIME_CSV_DELIMITER', ';'))
+parser.add_argument('--csv-quote-char',    **argument_options('INTIME_CSV_QUOTE_CHAR', '"'))
 
 args = parser.parse_args()
 if not args.url or not args.column_name_date or not args.column_name_total:
