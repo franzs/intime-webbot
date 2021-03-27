@@ -28,7 +28,11 @@ def login(username, password):
 
 
 def procon_round(total):
-    return str(int((float(total) + 7 / 60) / 0.25) * 0.25)
+    total_minutes = total.hour * 60 + total.minute
+    rounded_minutes = int((total_minutes + 7) / 15) * 15
+    rounded_hours = rounded_minutes / 60
+
+    return str(rounded_hours)
 
 
 def enter_day(date, total):
@@ -119,7 +123,10 @@ with open(args.filename, newline='') as csvfile:
             print(f"row {row} is not in current month. Ignoring.", file=sys.stderr)
             continue
 
-        enter_day(date.strftime('%d/%m/%Y'), procon_round(row[args.column_name_total]))
+        total = datetime.datetime.strptime(row[args.column_name_total], '%H:%M')
+        total_rounded = procon_round(total)
+
+        enter_day(date.strftime('%d/%m/%Y'), total_rounded)
 
 xpath = f"//input[@value='Save As Draft']"
 elem = driver.find_element_by_xpath(xpath)
