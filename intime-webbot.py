@@ -92,6 +92,9 @@ profile = webdriver.FirefoxProfile()
 driver = webdriver.Firefox(profile)
 wait = WebDriverWait(driver, 10)
 
+if not args.url.endswith('/'):
+    args.url += '/'
+
 if args.timesheet_ref:
     driver.get(args.url + f'timesheetEntry/webEntry?timesheetRef={args.timesheet_ref}')
 else:
