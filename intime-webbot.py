@@ -14,6 +14,11 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select, WebDriverWait
 
+DEFAULT_CSV_FORMAT_DATE = '%d.%m.%Y'
+DEFAULT_CSV_FORMAT_TIME = '%H:%M'
+DEFAULT_CSV_DELIMITER = ';'
+DEFAULT_CSV_QUOTE_CHAR = '"'
+
 
 def login(username, password):
     elem = wait.until(EC.presence_of_element_located((By.ID, 'j_username')))
@@ -68,8 +73,10 @@ parser.add_argument('--url',               **argument_options('INTIME_URL'))
 parser.add_argument('--timesheet-ref',     default=os.environ.get('INTIME_TIMESHEET_REF'))
 parser.add_argument('--column-name-date',  **argument_options('INTIME_COLUMN_NAME_DATE'))
 parser.add_argument('--column-name-total', **argument_options('INTIME_COLUMN_NAME_TOTAL'))
-parser.add_argument('--csv-delimiter',     **argument_options('INTIME_CSV_DELIMITER', ';'))
-parser.add_argument('--csv-quote-char',    **argument_options('INTIME_CSV_QUOTE_CHAR', '"'))
+parser.add_argument('--csv-format-date',   **argument_options('INTIME_CSV_FORMAT_DATE', DEFAULT_CSV_FORMAT_DATE))
+parser.add_argument('--csv-format-time',   **argument_options('INTIME_CSV_FORMAT_TIME', DEFAULT_CSV_FORMAT_TIME))
+parser.add_argument('--csv-delimiter',     **argument_options('INTIME_CSV_DELIMITER', DEFAULT_CSV_DELIMITER))
+parser.add_argument('--csv-quote-char',    **argument_options('INTIME_CSV_QUOTE_CHAR', DEFAULT_CSV_QUOTE_CHAR))
 
 args = parser.parse_args()
 if not args.url or not args.column_name_date or not args.column_name_total:
@@ -118,13 +125,13 @@ with open(args.filename, newline='') as csvfile:
         if not re.search(r'^\d+', row[args.column_name_date]):
             break
 
-        date = datetime.strptime(row[args.column_name_date], '%d.%m.%Y')
+        date = datetime.strptime(row[args.column_name_date], args.csv_format_date)
 
         if date.month != now.month or date.year != now.year:
             print(f"row {row} is not in current month. Ignoring.", file=sys.stderr)
             continue
 
-        total = datetime.strptime(row[args.column_name_total], '%H:%M')
+        total = datetime.strptime(row[args.column_name_total], args.csv_format_time)
         total_rounded = procon_round(total)
 
         enter_day(date.strftime('%d/%m/%Y'), total_rounded)
