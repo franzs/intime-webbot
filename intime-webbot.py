@@ -2,10 +2,11 @@
 
 import argparse
 import csv
-import datetime
 import os
 import re
 import sys
+
+from datetime import datetime
 
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
@@ -77,7 +78,7 @@ if not args.url or not args.column_name_date or not args.column_name_total:
 if not os.environ.get('INTIME_USERNAME') or not os.environ.get('INTIME_PASSWORD'):
     exit("Set environment variables INTIME_USERNAME and INTIME_PASSWORD.")
 
-now = datetime.datetime.now()
+now = datetime.now()
 
 profile = webdriver.FirefoxProfile()
 
@@ -117,13 +118,13 @@ with open(args.filename, newline='') as csvfile:
         if not re.search(r'^\d+', row[args.column_name_date]):
             break
 
-        date = datetime.datetime.strptime(row[args.column_name_date], '%d.%m.%Y')
+        date = datetime.strptime(row[args.column_name_date], '%d.%m.%Y')
 
         if date.month != now.month or date.year != now.year:
             print(f"row {row} is not in current month. Ignoring.", file=sys.stderr)
             continue
 
-        total = datetime.datetime.strptime(row[args.column_name_total], '%H:%M')
+        total = datetime.strptime(row[args.column_name_total], '%H:%M')
         total_rounded = procon_round(total)
 
         enter_day(date.strftime('%d/%m/%Y'), total_rounded)
