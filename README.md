@@ -12,7 +12,7 @@ Only Firefox is supported.
 
 ### Webdriver for Selenium
 
-Download [geckodriver](https://github.com/mozilla/geckodriver/releases) and install it for you operating system.
+Download [geckodriver](https://github.com/mozilla/geckodriver/releases) and install it for your operating system.
 
 ### Python packages
 
