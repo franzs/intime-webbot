@@ -19,6 +19,8 @@ DEFAULT_CSV_FORMAT_TIME = '%H:%M'
 DEFAULT_CSV_DELIMITER = ';'
 DEFAULT_CSV_QUOTE_CHAR = '"'
 
+INTIME_DATE_FORMAT = '%d/%m/%Y'
+
 
 def login(username, password):
     elem = wait.until(EC.presence_of_element_located((By.ID, 'j_username')))
@@ -42,7 +44,7 @@ def procon_round(total):
 
 
 def enter_day(date, total):
-    date_str = date.strftime('%d/%m/%Y')
+    date_str = date.strftime(INTIME_DATE_FORMAT)
 
     xpath = f"(//td[span[contains(text(), '{date_str}')]]/following-sibling::td)[1]/select"
     elem = wait.until(EC.presence_of_element_located((By.XPATH, xpath)))
@@ -119,7 +121,7 @@ if not args.timesheet_ref:
     elem = wait.until(EC.presence_of_element_located((By.ID, 'timesheetDate')))
     elem.click()
     elem.clear()
-    elem.send_keys(now.strftime('%d/%m/%Y'))
+    elem.send_keys(now.strftime(INTIME_DATE_FORMAT))
 
     steal_focus()
 
