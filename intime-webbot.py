@@ -42,12 +42,14 @@ def procon_round(total):
 
 
 def enter_day(date, total):
-    xpath = f"(//td[span[contains(text(), '{date}')]]/following-sibling::td)[1]/select"
+    date_str = date.strftime('%d/%m/%Y')
+
+    xpath = f"(//td[span[contains(text(), '{date_str}')]]/following-sibling::td)[1]/select"
     elem = wait.until(EC.presence_of_element_located((By.XPATH, xpath)))
     select = Select(elem)
     select.select_by_visible_text('Stunde(n) Remote')
 
-    xpath = f"(//td[span[contains(text(), '{date}')]]/following-sibling::td)[6]/input"
+    xpath = f"(//td[span[contains(text(), '{date_str}')]]/following-sibling::td)[6]/input"
     elem = wait.until(EC.presence_of_element_located((By.XPATH, xpath)))
     elem.clear()
     elem.send_keys(total)
@@ -137,7 +139,7 @@ with open(args.filename, newline='') as csvfile:
         total = datetime.strptime(row[args.column_name_total], args.csv_format_time)
         total_rounded = procon_round(total)
 
-        enter_day(date.strftime('%d/%m/%Y'), total_rounded)
+        enter_day(date, total_rounded)
 
 xpath = f"//input[@value='Save As Draft']"
 elem = driver.find_element_by_xpath(xpath)
