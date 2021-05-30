@@ -59,6 +59,18 @@ def enter_day(date, total):
     steal_focus()
 
 
+def enter_timesheet_date(date):
+    select = Select(driver.find_element_by_name('selectedPlacement'))
+    select.select_by_index(1)
+
+    elem = wait.until(EC.presence_of_element_located((By.ID, 'timesheetDate')))
+    elem.click()
+    elem.clear()
+    elem.send_keys(date.strftime(INTIME_DATE_FORMAT))
+
+    steal_focus()
+
+
 def steal_focus():
     driver.find_element_by_xpath("//body").click()
 
@@ -115,15 +127,7 @@ except TimeoutException:
     exit("Login failed.")
 
 if not args.timesheet_ref:
-    select = Select(driver.find_element_by_name('selectedPlacement'))
-    select.select_by_index(1)
-
-    elem = wait.until(EC.presence_of_element_located((By.ID, 'timesheetDate')))
-    elem.click()
-    elem.clear()
-    elem.send_keys(now.strftime(INTIME_DATE_FORMAT))
-
-    steal_focus()
+    enter_timesheet_date(now)
 
 with open(args.filename, newline='') as csvfile:
     csvreader = csv.DictReader(csvfile, delimiter=args.csv_delimiter, quotechar=args.csv_quote_char)
