@@ -126,20 +126,24 @@ except TimeoutException:
     driver.close()
     exit("Login failed.")
 
-if not args.timesheet_ref:
-    enter_timesheet_date(now)
-
 with open(args.filename, newline='') as csvfile:
     csvreader = csv.DictReader(csvfile, delimiter=args.csv_delimiter, quotechar=args.csv_quote_char)
 
+    first_date = None
     for row in csvreader:
         if not re.search(r'^\d+', row[args.column_name_date]):
             break
 
         date = datetime.strptime(row[args.column_name_date], args.csv_format_date)
 
-        if date.month != now.month or date.year != now.year:
-            print(f"row {row} is not in current month. Ignoring.", file=sys.stderr)
+        if not first_date:
+            first_date = date
+
+            if not args.timesheet_ref:
+                enter_timesheet_date(first_date)
+
+        if date.month != first_date.month or date.year != first_date.year:
+            print(f"row {row} is not in the month of the first date. Ignoring.", file=sys.stderr)
             continue
 
         total = datetime.strptime(row[args.column_name_total], args.csv_format_time)
